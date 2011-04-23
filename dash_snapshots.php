@@ -8,7 +8,7 @@
 			
 				<li class="item clear">
 				
-					<span class="date pct20 minor"><?php echo $snapshot->date->friendly; ?></span>
+					<span class="date pct20 minor"><?php echo $snapshot->date->fuzzy; ?></span>
 					<span class="size pct55 minor">
 						<?php echo _t( '%s snapshot', array( ucfirst( $snapshot->type ) ) ) . ': ' . Utils::human_size( $snapshot->size ); ?>
 					</span>
