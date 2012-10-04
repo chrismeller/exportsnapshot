@@ -1,8 +1,8 @@
 <ul class="items">
 
-	<?php 
+	<?php
 	
-		foreach ( $snapshots as $snapshot ) {
+		foreach ( $content->snapshots as $snapshot ) {
 			
 			?>
 			

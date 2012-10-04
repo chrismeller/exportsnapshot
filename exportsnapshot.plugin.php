@@ -1,6 +1,12 @@
 <?php
 
 	class ExportSnapshot extends Plugin {
+
+		public function action_init ( ) {
+
+			$this->add_template( 'dashboard.block.exportsnapshot', __DIR__ . '/dashboard.block.exportsnapshot.php' );
+
+		}
 		
 		public function action_plugin_activation ( $file = '' ) {
 			
@@ -11,9 +17,6 @@
 				// save the default options
 				Options::set( 'exportsnapshot__frequency', 'manually' );
 				Options::set( 'exportsnapshot__type', 'blogml' );
-				
-				// add the module
-				Modules::add( _t('Snapshots', 'exportsnapshot') );
 				
 			}
 			
@@ -29,59 +32,62 @@
 				Options::delete( 'exportsnapshot__frequency' );
 				Options::delete( 'exportsnapshot__type' );
 				
-				// remove the module
-				Modules::remove_by_name( _t('Snapshots', 'exportsnapshot') );
-				
 				// @todo what about the snapshots option and deleting those cached items?
 				// probably an uninstall method too?
 				
 			}
 			
 		}
-		
-		public function filter_dash_modules ( $modules ) {
-			
-			if ( User::identify()->can( 'snapshot', 'read' ) ) {
-				
-				$modules[] = _t('Latest Snapshots', 'exportsnapshot');
-				
-				$this->add_template( 'dash_snapshots', dirname( __FILE__ ) . '/dash_snapshots.php' );
-				
-			}
-			
-			return $modules;
-			
+
+		/**
+		 * Add the blocks this plugin provides to the list of available blocks
+		 * @param array $block_list An array of block names, indexed by unique string identifiers
+		 * @return array The altered array
+		 */
+		public function filter_block_list ( $block_list ) {
+			$block_list['exportsnapshot'] = _t( 'Latest Export Snapshots' );
+			return $block_list;
 		}
-		
-		public function filter_dash_module_latest_snapshots ( $module, $module_id, $theme ) {
-			
+
+		/**
+		 * Return a list of blocks that can be used for the dashboard
+		 * @param array $block_list An array of block names, indexed by unique string identifiers
+		 * @return array The altered array
+		 */
+		public function filter_dashboard_block_list($block_list)
+		{
+			return $this->filter_block_list($block_list);
+		}
+
+		/**
+		 * Produce the content for the latest drafts block
+		 * @param Block $block The block object
+		 * @param Theme $theme The theme that the block will be output with
+		 */
+		public function action_block_content_exportsnapshot ( $block, $theme ) {
+
 			$snapshots = Options::get( 'exportsnapshot__snapshots', array() );
-			
+
 			// reverse sort by key (ie: newest timestamp first)
 			krsort( $snapshots );
-			
+
 			// a max of 8, or the number we have
-			$count = ( count( $snapshots ) > 8 ) ? 8 : count( $snapshots );
-			
+			$count = min( count( $snapshots ), 8 );
+
 			$snapshots = array_slice( $snapshots, 0, $count, true );
-			
+
 			$s = array();
 			foreach ( $snapshots as $ts => $snapshot ) {
 				$t = new stdClass();
 				$t->date = HabariDateTime::date_create( $ts );
 				$t->size = $snapshot['size'];
 				$t->type = $snapshot['type'];
-				
+
 				$s[] = $t;
 			}
-			
-			$theme->snapshots = $s;
-			
-			$module['title'] = _t('Latest Snapshots', 'exportsnapshot');
-			$module['content'] = $theme->fetch('dash_snapshots');
-			
-			return $module;
-			
+
+			$block->snapshots = $s;
+
 		}
 		
 		public function filter_plugin_config ( $actions, $plugin_id ) {

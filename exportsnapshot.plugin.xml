@@ -4,7 +4,7 @@
 	<license url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License 2.0</license>
 	<url>http://habariproject.org</url>
 	<author url="http://chrismeller.com/">Chris Meller</author>
-	<version>0.1</version>
+	<version>0.2</version>
 	<guid>c73d0e0f-5e8c-4eb6-b360-920440b512ce</guid>
 	<description><![CDATA[Save Exports as snapshots for easy point-in-time restores.]]></description>
 	<requires>
